@@ -1,9 +1,9 @@
 ﻿using Dominio;
 using TestBank.Class;
 
-class Program
+public partial class Program
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         Boleto _boleto = new Boleto(new Cliente(new List<ClienteObj>()), new Conta(new List<ContaObj>()), new List<BoletoObj>());
         Cliente _cliente = new Cliente(new List<ClienteObj>());
@@ -52,7 +52,6 @@ class Program
             Console.Write("Opção escolhida: ");
 
             var opcao = Console.ReadLine();
-            Console.Clear();
 
             switch (opcao)
             {
@@ -244,6 +243,7 @@ class Program
                     _transacao.EfetuarTransferencia(idContaOrigem, idContaDestino, valor);
                     break;
                 default:
+                    sair = true;
                     Console.WriteLine("Opção inválida.");
                     break;
             }
