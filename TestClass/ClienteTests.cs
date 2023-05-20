@@ -13,7 +13,7 @@ namespace TestClass
         public void Initialize()
         {
             _listaClientes = new List<ClienteObj>();
-            _cliente = new Cliente();
+            _cliente = new Cliente(_listaClientes);
         }
 
         [TestMethod]
@@ -55,18 +55,26 @@ namespace TestClass
             var telefoneNovo = "987654321";
             var enderecoNovo = "Rua Nova, 456";
 
-            var clienteExistente = new ClienteObj()
+            var clienteAntigo = new ClienteObj()
             {
-                Nome = nomeAntigo,
                 Cpf = cpf,
+                Nome = nomeAntigo,
                 Endereco = "Rua Antiga, 123",
                 Telefone = "123456789"
             };
 
-            _listaClientes.Add(clienteExistente);
+            var clienteNovo = new ClienteObj()
+            {
+                Cpf = cpf,
+                Nome = nomeNovo,
+                Endereco = enderecoNovo,
+                Telefone = telefoneNovo
+            };
+
+            _listaClientes.Add(clienteAntigo);
 
             // Act
-            _cliente.AlterarCliente(clienteExistente);
+            _cliente.AlterarCliente(clienteNovo);
 
             // Assert
             var clienteAlterado = _cliente.BuscarClientePorCpf(cpf);
@@ -96,11 +104,12 @@ namespace TestClass
             _listaClientes.Add(clienteExistente);
 
             // Act
-            _cliente.ConsultarCliente();
+            var retorno = _cliente.BuscarClientePorCpf(cpf);
 
             // Assert
-            // Simular a leitura dos dados de saída (Console.WriteLine) e verificar se os dados estão corretos
-            // Não é possível fazer o assert direto na saída do Console.WriteLine em um teste unitário
+            Assert.AreEqual(nome, retorno.Nome);
+            Assert.AreEqual(telefone, retorno.Telefone);
+            Assert.AreEqual(endereco, retorno.Endereco);
         }
     }
 }

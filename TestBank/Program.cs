@@ -5,14 +5,14 @@ class Program
 {
     static void Main(string[] args)
     {
-        Boleto _boleto = new Boleto(new Cliente(), new Conta(),new List<BoletoObj>());
-        Cliente _cliente = new Cliente();
-        Conta _conta = new Conta();
-        Fatura _fatura = new Fatura();
-        Investimento _investimento = new Investimento();
-        Relatorio _relatorio = new Relatorio();
-        Taxa _taxa = new Taxa();
-        Transacao _transacao = new Transacao();
+        Boleto _boleto = new Boleto(new Cliente(new List<ClienteObj>()), new Conta(new List<ContaObj>()), new List<BoletoObj>());
+        Cliente _cliente = new Cliente(new List<ClienteObj>());
+        Conta _conta = new Conta(new List<ContaObj>());
+        Fatura _fatura = new Fatura(new List<FaturaObj>(), new Conta(new List<ContaObj>()));
+        Investimento _investimento = new Investimento(new List<InvestimentoObj>(), new Conta(new List<ContaObj>()));
+        Relatorio _relatorio = new Relatorio(new Conta(new List<ContaObj>()), new List<TransacaoObj>());
+        Taxa _taxa = new Taxa(new List<TaxaObj>());
+        Transacao _transacao = new Transacao(new Conta(new List<ContaObj>()));
 
         bool sair = false;
         while (!sair)
@@ -103,19 +103,30 @@ class Program
                     };
                     _cliente.AlterarCliente(cliente);
                     break;
-                case "6":
-                    _cliente.ConsultarCliente();
-                    break;
                 case "7":
                     Console.WriteLine("Digite o cpf:");
                     string cpf3 = Console.ReadLine();
                     _cliente.BuscarClientePorCpf(cpf3);
                     break;
                 case "8":
-                    _conta.AbrirConta();
+                    Console.WriteLine("Digite o CPF do cliente para abrir a conta:");
+                    string cpf5 = Console.ReadLine();
+
+                    Console.WriteLine("Digite o tipo de conta (1-Conta Corrente / 2-Conta Poupança):");
+                    int tipoConta = int.Parse(Console.ReadLine());
+
+                    var conta = new ContaObj()
+                    {
+                        CpfCliente = cpf5,
+                        Saldo = 0.00,
+                        TipoConta = (Enums.TipoConta)tipoConta
+                    };
+                    _conta.AbrirConta(conta);
                     break;
                 case "9":
-                    _conta.FecharConta();
+                    Console.Write("Digite o número da conta que deseja fechar: ");
+                    int numeroConta = int.Parse(Console.ReadLine());
+                    _conta.FecharConta(numeroConta);
                     break;
                 case "10":
                     Console.WriteLine("Digite o cpf:");
@@ -142,16 +153,28 @@ class Program
                     _conta.EfetuarDeposito(valorBoleto4, idConta4);
                     break;
                 case "14":
-                    _fatura.ConsultarFaturasEmAberto();
+                    Console.WriteLine("Digite o número da conta:");
+                    int numeroConta2 = int.Parse(Console.ReadLine());
+                    _fatura.ConsultarFaturasEmAberto(numeroConta2);
                     break;
                 case "15":
-                    _fatura.PagarFatura();
+                    Console.WriteLine("Digite o Id da fatura que deseja pagar:");
+                    int idFatura = int.Parse(Console.ReadLine());
+                    _fatura.PagarFatura(idFatura);
                     break;
                 case "16":
-                    _investimento.RealizarInvestimento();
+                    Console.WriteLine("Digite o Id da conta:");
+                    int idConta6 = int.Parse(Console.ReadLine());
+                    Console.WriteLine("Digite o valor a ser investido:");
+                    double valorInserido = double.Parse(Console.ReadLine());
+                    _investimento.RealizarInvestimento(idConta6, valorInserido);
                     break;
                 case "17":
-                    _investimento.ResgatarInvestimento();
+                    Console.WriteLine("Digite o número da conta:");
+                    int numeroConta3 = int.Parse(Console.ReadLine());
+                    Console.WriteLine("Informe o Id do investimento que deseja resgatar: ");
+                    int idInvestimento = int.Parse(Console.ReadLine());
+                    _investimento.ResgatarInvestimento(numeroConta3, idInvestimento);
                     break;
                 case "18":
                     Console.WriteLine("Digite o Id da conta:");
@@ -159,36 +182,66 @@ class Program
                     _investimento.BuscarInvestimentosPorConta(idConta5);
                     break;
                 case "19":
-                    _relatorio.ObterSaldo();
+                    Console.Write("Digite o número da conta: ");
+                    int numeroConta4 = int.Parse(Console.ReadLine());
+                    _relatorio.ObterSaldo(numeroConta4);
                     break;
                 case "20":
-                    _relatorio.ConsultarExtrato();
+                    Console.WriteLine("Informe o número da conta:");
+                    int numeroConta5 = int.Parse(Console.ReadLine());
+                    Console.WriteLine("Informe o Id da transacao:");
+                    int idTransacao = int.Parse(Console.ReadLine());
+                    _relatorio.ConsultarExtrato(numeroConta5, idTransacao);
                     break;
                 case "21":
-                    _relatorio.GerarRelatorioContas();
+                    _relatorio.GerarRelatorioTransacoes();
                     break;
                 case "22":
-                    _taxa.AdicionarTaxa();
+                    Console.Write("Informe a descrição da taxa: ");
+                    string descricao = Console.ReadLine();
+                    Console.Write("Informe o valor da taxa: ");
+                    double valorTaxa = double.Parse(Console.ReadLine());
+                    _taxa.AdicionarTaxa(descricao, valorTaxa);
                     break;
                 case "23":
-                    _taxa.RemoverTaxa();
+                    Console.Write("Informe o Id da taxa que deseja remover: ");
+                    int idTaxa = int.Parse(Console.ReadLine());
+
+                    _taxa.RemoverTaxa(idTaxa);
                     break;
                 case "24":
                     Console.WriteLine("Digite o Id da taxa:");
-                    int idTaxa = int.Parse(Console.ReadLine());
-                    _taxa.BuscarTaxaPorId(idTaxa);
+                    int idTaxa2 = int.Parse(Console.ReadLine());
+                    _taxa.BuscarTaxaPorId(idTaxa2);
                     break;
                 case "25":
                     _taxa.ConsultarTodasTaxas();
                     break;
                 case "26":
-                    _transacao.EfetuarDeposito();
+                    Console.Write("Digite o Id da conta: ");
+                    int idConta7 = int.Parse(Console.ReadLine());
+                    Console.Write("Digite o valor a ser depositado: ");
+                    double valorDepositado = double.Parse(Console.ReadLine());
+
+                    _transacao.EfetuarDeposito(idConta7, valorDepositado);
                     break;
                 case "27":
-                    _transacao.EfetuarSaque();
+                    Console.Write("Digite o Id da conta: ");
+                    int idConta8 = int.Parse(Console.ReadLine());
+                    Console.Write("Digite o valor a ser sacado: ");
+                    double valorSacado = double.Parse(Console.ReadLine());
+
+                    _transacao.EfetuarSaque(idConta8, valorSacado);
                     break;
                 case "28":
-                    _transacao.EfetuarTransferencia();
+                    Console.Write("Digite o Id da conta de origem: ");
+                    int idContaOrigem = int.Parse(Console.ReadLine());
+                    Console.Write("Digite o Id da conta de destino: ");
+                    int idContaDestino = int.Parse(Console.ReadLine());
+                    Console.Write("Digite o valor a ser transferido: ");
+                    double valor = double.Parse(Console.ReadLine());
+
+                    _transacao.EfetuarTransferencia(idContaOrigem, idContaDestino, valor);
                     break;
                 default:
                     Console.WriteLine("Opção inválida.");

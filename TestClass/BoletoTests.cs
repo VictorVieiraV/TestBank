@@ -1,5 +1,4 @@
 ﻿using Dominio;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using TestBank.Class;
 
 namespace TestClass
@@ -15,8 +14,8 @@ namespace TestClass
         [TestInitialize]
         public void Initialize()
         {
-            _cliente = new Cliente();
-            _conta = new Conta();
+            _cliente = new Cliente(new List<ClienteObj>());
+            _conta = new Conta(new List<ContaObj>());
             _listaBoletos = new List<BoletoObj>();
             _boleto = new Boleto(_cliente, _conta, _listaBoletos);
         }

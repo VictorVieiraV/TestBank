@@ -5,80 +5,64 @@ namespace TestBank.Class
 {
     public class Conta
     {
-        Cliente _cliente = new Cliente();
-        List<ContaObj> listaContas = new List<ContaObj>();
+        private List<ContaObj> _listaContas;
+
+        public Conta(List<ContaObj> listaContas)
+        {
+            _listaContas = listaContas;
+        }
+
         public void AddConta(ContaObj conta)
         {
-            listaContas.Add(conta);
+            _listaContas.Add(conta);
         }
-        public void AbrirConta()
+        public string AbrirConta(ContaObj conta)
         {
-            Console.WriteLine("Digite o CPF do cliente para abrir a conta:");
-            string cpf = Console.ReadLine();
+            int maxCount = _listaContas.Count();
+            conta.Id = maxCount + 1;
 
-            Console.WriteLine("Digite o tipo de conta (1-Conta Corrente / 2-Conta Poupança):");
-            int tipoConta = int.Parse(Console.ReadLine());
-            int maxCount = listaContas.Count();
-
-            if (tipoConta == 1)
+            if (conta.TipoConta == Enums.TipoConta.Poupanca)
             {
-                ContaObj conta = new ContaObj()
-                {
-                    Id = maxCount + 1,
-                    CpfCliente = cpf,
-                    Saldo = 0.00,
-                    TipoConta = Enums.TipoConta.Poupanca
-                };
                 AddConta(conta);
-                Console.WriteLine($"Conta corrente criada com sucesso.");
+                return ("Conta corrente criada com sucesso.");
             }
-            else if (tipoConta == 2)
+            else if (conta.TipoConta == Enums.TipoConta.Corrente)
             {
-                ContaObj conta = new ContaObj()
-                {
-                    Id = maxCount + 1,
-                    CpfCliente = cpf,
-                    Saldo = 0.00,
-                    TipoConta = Enums.TipoConta.Corrente
-                };
-
-                listaContas.Add(conta);
-                Console.WriteLine($"Conta poupança criada com sucesso.");
+                _listaContas.Add(conta);
+                return ("Conta poupança criada com sucesso.");
             }
             else
             {
-                Console.WriteLine("Tipo de conta inválido.");
+                return ("Tipo de conta inválido.");
             }
         }
 
-        public void FecharConta()
+        public string FecharConta(int numeroConta)
         {
-            Console.Write("Digite o número da conta que deseja fechar: ");
-            int numeroConta = int.Parse(Console.ReadLine());
 
-            ContaObj conta = listaContas.Where(x => x.Id == numeroConta).FirstOrDefault();
+            ContaObj conta = _listaContas.Where(x => x.Id == numeroConta).FirstOrDefault();
 
             if (conta != null)
             {
                 if (conta.Saldo >= 0)
                 {
-                    listaContas.Remove(conta);
-                    Console.WriteLine("Conta fechada com sucesso.");
+                    _listaContas.Remove(conta);
+                    return "Conta fechada com sucesso.";
                 }
                 else
                 {
-                    Console.WriteLine("Não é possível fechar a conta. Saldo negativo.");
+                    return "Não é possível fechar a conta. Saldo negativo.";
                 }
             }
             else
             {
-                Console.WriteLine("Conta não encontrada.");
+                return "Conta não encontrada.";
             }
         }
 
         public List<ContaObj> BuscarContasPorCpf(string cpf)
         {
-            var contas = listaContas.Where(x => x.CpfCliente == cpf).ToList();
+            var contas = _listaContas.Where(x => x.CpfCliente == cpf).ToList();
 
             if (contas != null)
             {
@@ -89,7 +73,7 @@ namespace TestBank.Class
 
         public ContaObj BuscarContaPorId(int id)
         {
-            var conta = listaContas.Where(x => x.Id == id).FirstOrDefault();
+            var conta = _listaContas.Where(x => x.Id == id).FirstOrDefault();
 
             if (conta != null)
             {
@@ -112,7 +96,7 @@ namespace TestBank.Class
         public bool EfetuarDeposito(double valor, int idConta)
         {
             ContaObj conta = BuscarContaPorId(idConta);
-            if (conta.Saldo >= valor)
+            if (conta.Id > 0)
             {
                 conta.Saldo += valor;
                 return true;
@@ -122,7 +106,7 @@ namespace TestBank.Class
 
         public bool RealizarTransferencia(ContaObj contaOrigem, ContaObj contaDestino, double valor, out double saldoOrigem, out double saldoDestino)
         {
-            if (EfetuarDebito(valor, contaDestino.Id) && EfetuarDeposito(valor, contaOrigem.Id))
+            if (EfetuarDebito(valor, contaOrigem.Id) && EfetuarDeposito(valor, contaDestino.Id))
             {
                 saldoOrigem = contaOrigem.Saldo;
                 saldoDestino = contaDestino.Saldo;

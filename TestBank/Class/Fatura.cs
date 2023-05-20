@@ -4,74 +4,54 @@ namespace TestBank.Class
 {
     public class Fatura
     {
-        Conta _conta = new Conta();
-        List<FaturaObj> listaFaturas = new List<FaturaObj>();
+        Conta _conta;
+        private List<FaturaObj> _listaFaturas;
+        private List<ContaObj> _listaContas;
 
-        public void ConsultarFaturasEmAberto()
+        public Fatura(List<FaturaObj> listaFaturas, Conta conta)
         {
-            Console.WriteLine("Digite o número da conta:");
-            int numeroConta = int.Parse(Console.ReadLine());
-
-            ContaObj conta = _conta.BuscarContaPorId(numeroConta);
-
-            if (conta == null)
-            {
-                Console.WriteLine("Conta não encontrada.");
-                return;
-            }
-
-            var faturas = listaFaturas.Where(x => x.IdConta == numeroConta).ToList();
-            foreach (var fatura in faturas)
-            {
-                Console.WriteLine("Fatura da conta: " + numeroConta);
-                Console.WriteLine("Data Vencimento: " + fatura.DataVencimento);
-                Console.WriteLine("Valor: R$" + fatura.Valor);
-            }
+            _listaFaturas = listaFaturas;
+            _conta = conta;
         }
 
-        public void PagarFatura()
+        public List<FaturaObj> ConsultarFaturasEmAberto(int idConta)
         {
-            Console.WriteLine("Digite o Id da conta:");
-            int idConta = int.Parse(Console.ReadLine());
+            return _listaFaturas.Where(x => x.IdConta == idConta &&
+                                            x.StatusFatura == Enums.StatusFatura.Aberta)
+                                            .ToList();
+        }
 
-            var faturas = listaFaturas.Where(x => x.IdConta == idConta).ToList();
-            foreach (var fatura in faturas)
+        public string PagarFatura(int idFatura)
+        {
+            var faturaAtual = _listaFaturas.Where(x => x.IdFatura == idFatura &&
+                                                       x.StatusFatura == Enums.StatusFatura.Aberta)
+                                                       .FirstOrDefault();
+
+            if (faturaAtual != null && faturaAtual.IdFatura > 0)
             {
-                Console.WriteLine("Id da conta: " + fatura.IdConta);
-                Console.WriteLine("Data Vencimento: " + fatura.DataVencimento);
-                Console.WriteLine("Valor: R$" + fatura.Valor);
-                Console.WriteLine();
-            }
+                ContaObj conta = _conta.BuscarContaPorId(faturaAtual.IdConta);
 
-            Console.WriteLine("Digite o Id da fatura que deseja pagar:");
-            int idFatura = int.Parse(Console.ReadLine());
-
-            var faturaAtual = listaFaturas.Where(x => x.IdFatura == idFatura).FirstOrDefault();
-
-            if (faturaAtual != null)
-            {
-                ContaObj conta = _conta.BuscarContaPorId(idConta);
-                if (conta != null)
+                if (conta.Id > 0)
                 {
                     if (conta.Saldo > faturaAtual.Valor)
                     {
                         conta.Saldo -= faturaAtual.Valor;
                         faturaAtual.StatusFatura = Enums.StatusFatura.Paga;
-                        Console.WriteLine("Fatura paga com sucesso.");
+                        return "Fatura paga com sucesso.";
                     }
                     else
                     {
-                        Console.WriteLine("Conta não possui saldo suficiente para pagar fatura.");
+                        return "Conta não possui saldo suficiente para pagar fatura.";
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Conta não encontrada.");
+                    return "Conta não encontrada.";
                 }
             }
             else
             {
-                Console.WriteLine("Fatura não encontrado.");
+                return "Fatura não encontrada.";
             }
         }
     }

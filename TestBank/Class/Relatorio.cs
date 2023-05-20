@@ -4,50 +4,59 @@ namespace TestBank.Class
 {
     public class Relatorio
     {
-        Conta _conta = new Conta();
-        List<TransacaoObj> listaTransacoes = new List<TransacaoObj>();
-        List<ContaObj> listaContas = new List<ContaObj>();
-        public void ObterSaldo()
+        Conta _conta;
+        List<TransacaoObj> _listaTransacoes;
+        List<ContaObj> _listaContas;
+
+        public Relatorio(Conta conta, List<TransacaoObj> listaTransacoes)
         {
-            Console.Write("Digite o número da conta: ");
-            int numeroConta = int.Parse(Console.ReadLine());
-            ContaObj contaSelecionada = _conta.BuscarContaPorId(numeroConta);
-
-            if (contaSelecionada == null)
-            {
-                Console.WriteLine("Conta não encontrada.");
-                return;
-            }
-
-            Console.WriteLine("Saldo atual da conta {0}: R$ {1}", contaSelecionada.Id, contaSelecionada.Saldo);
+            _listaTransacoes = listaTransacoes;
+            _conta = conta;
         }
 
-        public void ConsultarExtrato()
+        public string ObterSaldo(int numeroConta)
         {
-            Console.WriteLine("Informe o número da conta:");
-            int numeroConta = int.Parse(Console.ReadLine());
             ContaObj contaSelecionada = _conta.BuscarContaPorId(numeroConta);
 
-            if (contaSelecionada == null)
+            if (contaSelecionada.Id == 0)
             {
-                Console.WriteLine("Conta não encontrada.");
-                return;
+                return "Conta não encontrada.";
             }
 
-            Console.WriteLine($"Extrato da conta {contaSelecionada.Id}:");
-            foreach (var transacao in listaTransacoes)
-            {
-                Console.WriteLine($"Data: {transacao.Data}, Valor: {transacao.Valor}");
-            }
+            return $"Saldo atual da conta {contaSelecionada.Id}: R$ {contaSelecionada.Saldo}";
         }
 
-        public void GerarRelatorioContas()
+        public string ConsultarExtrato(int numeroConta, int idTransacao)
         {
-            Console.WriteLine("Relatório geral:");
-            foreach (var conta in listaContas)
+            ContaObj contaSelecionada = _conta.BuscarContaPorId(numeroConta);
+
+            if (contaSelecionada != null && contaSelecionada.Id > 0)
             {
-                Console.WriteLine($"Conta: {conta.Id}    /    Saldo {conta.Saldo}");
+                if (_listaTransacoes.Where(x => x.IdConta == contaSelecionada.Id).ToList().Count > 0)
+                {
+                    foreach (var transacao in _listaTransacoes)
+                    {
+                        if (transacao.IdTransacao == idTransacao)
+                        {
+                            return $"IdConta: {transacao.IdConta}, Valor: {transacao.Valor}";
+                        }
+                    }
+                }
+                else
+                {
+                    return $"Conta não possui transações.";
+                }
             }
+            return "Conta não encontrada.";
+        }
+
+        public string GerarRelatorioTransacoes()
+        {
+            foreach (var transacao in _listaTransacoes)
+            {
+                return $"Conta: {transacao.IdConta}    /    Saldo {transacao.Valor}";
+            }
+            return "Não foi possível gerar o relatorio.";
         }
     }
 }

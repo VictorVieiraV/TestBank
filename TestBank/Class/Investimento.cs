@@ -4,32 +4,29 @@ namespace TestBank.Class
 {
     public class Investimento
     {
-        List<InvestimentoObj> listaInvestimentos = new List<InvestimentoObj>();
-        Conta _conta = new Conta();
+        List<InvestimentoObj> _listaInvestimentos;
+        Conta _conta;
 
-        public void RealizarInvestimento()
+        public Investimento(List<InvestimentoObj> listaInvestimentos, Conta conta)
         {
-            Console.WriteLine("Digite o Id da conta:");
-            int idConta = int.Parse(Console.ReadLine());
-
+            _listaInvestimentos = listaInvestimentos;
+            _conta = conta;
+        }
+        public string RealizarInvestimento(int idConta, double valorInserido)
+        {
             ContaObj conta = _conta.BuscarContaPorId(idConta);
-            if (conta == null)
+            if (conta == null && conta.Id == 0)
             {
-                Console.WriteLine("Conta não encontrada.");
-                return;
+                return "Conta não encontrada.";
             }
-
-            Console.WriteLine("Digite o valor a ser investido:");
-            double valorInserido = double.Parse(Console.ReadLine());
 
             if (valorInserido <= 0)
             {
-                Console.WriteLine("Valor inválido.");
-                return;
+                return "Valor inválido.";
             }
             else
             {
-                var maxId = listaInvestimentos.Count();
+                var maxId = _listaInvestimentos.Count();
                 InvestimentoObj investimentoObj = new InvestimentoObj()
                 {
                     IdConta = conta.Id,
@@ -37,45 +34,32 @@ namespace TestBank.Class
                     PorcentagemGanhos = 2.00,
                     Valor = valorInserido
                 };
-                listaInvestimentos.Add(investimentoObj);
+                _listaInvestimentos.Add(investimentoObj);
                 conta.Saldo -= valorInserido;
-                Console.WriteLine($"Investimento realizado com sucesso. Novo saldo: {conta.Saldo}");
+                return $"Investimento realizado com sucesso. Novo saldo: {conta.Saldo}";
             }
         }
 
-        public void ResgatarInvestimento()
+        public string ResgatarInvestimento(int numeroConta, int idInvestimento)
         {
-            Console.WriteLine("Digite o número da conta:");
-            int numeroConta = int.Parse(Console.ReadLine());
-
             List<InvestimentoObj> investimentos = BuscarInvestimentosPorConta(numeroConta);
 
-            if (investimentos != null)
+            if (investimentos != null && investimentos.Count > 0)
             {
-                foreach (var investimento in investimentos)
-                {
-                    Console.WriteLine("Investimento: " + investimento.IdInvestimento);
-                    Console.WriteLine("Valor: " + investimento.Valor);
-                    Console.WriteLine("Porcentagem de ganho: " + investimento.PorcentagemGanhos);
-                }
-
-                Console.WriteLine("Informe o Id do investimento que deseja resgatar: ");
-                int idSelecionado = int.Parse(Console.ReadLine());
-                var investimentoSelecionado = investimentos.Where(x => x.IdInvestimento == idSelecionado).FirstOrDefault();
+                var investimentoSelecionado = investimentos.Where(x => x.IdInvestimento == idInvestimento).FirstOrDefault();
                 var contaSelecionado = _conta.BuscarContaPorId(numeroConta);
-                contaSelecionado.Saldo += investimentoSelecionado.Valor * investimentoSelecionado.PorcentagemGanhos;
-                Console.WriteLine("Investimento resgatado com sucesso. Novo saldo bancario: " + contaSelecionado.Saldo);
+                contaSelecionado.Saldo += investimentoSelecionado.Valor + (investimentoSelecionado.Valor * investimentoSelecionado.PorcentagemGanhos);
+                return "Investimento resgatado com sucesso. Novo saldo bancario: " + contaSelecionado.Saldo;
             }
             else
             {
-                Console.WriteLine("Investimentos não encontrada.");
-                return;
+                return "Investimentos não encontrados.";
             }
         }
 
         public List<InvestimentoObj> BuscarInvestimentosPorConta(int numeroConta)
         {
-            return listaInvestimentos.Where(x => x.IdConta == numeroConta).ToList();
+            return _listaInvestimentos.Where(x => x.IdConta == numeroConta).ToList();
         }
     }
 }

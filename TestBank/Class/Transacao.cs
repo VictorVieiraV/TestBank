@@ -4,103 +4,88 @@ namespace TestBank.Class
 {
     public class Transacao
     {
-        Conta _conta = new Conta();
-        public void EfetuarDeposito()
-        {
-            Console.Write("Digite o Id da conta: ");
-            int idConta = int.Parse(Console.ReadLine());
+        Conta _conta;
 
+        public Transacao(Conta conta)
+        {
+            _conta = conta;
+        }
+        public string EfetuarDeposito(int idConta, double valorDepositado)
+        {
             ContaObj conta = _conta.BuscarContaPorId(idConta);
 
-            if (conta != null)
+            if (conta != null && conta.Id > 0)
             {
-                Console.Write("Digite o valor a ser depositado: ");
-                double valorDepositado = double.Parse(Console.ReadLine());
-
                 if (_conta.EfetuarDeposito(valorDepositado, idConta))
                 {
-                    Console.WriteLine("Depósito realizado com sucesso. Novo saldo da conta: " + conta.Saldo);
+                    return $"Depósito realizado com sucesso. Novo saldo da conta: {conta.Saldo}";
                 }
                 else
                 {
-                    Console.WriteLine("Não foi possível realizar o deposito.");
+                    return "Não foi possível realizar o deposito.";
                 }
             }
             else
             {
-                Console.WriteLine("Conta não encontrada.");
+                return "Conta não encontrada.";
             }
         }
 
-        public void EfetuarSaque()
+        public string EfetuarSaque(int idConta, double valorSacado)
         {
-            Console.Write("Digite o Id da conta: ");
-            int idConta = int.Parse(Console.ReadLine());
-
             ContaObj conta = _conta.BuscarContaPorId(idConta);
 
-            if (conta != null)
+            if (conta != null && conta.Id > 0)
             {
-                Console.Write("Digite o valor a ser sacado: ");
-                double valorSacado = double.Parse(Console.ReadLine());
-
-                if (_conta.EfetuarDeposito(valorSacado, idConta))
+                if (_conta.EfetuarDebito(valorSacado, idConta))
                 {
-                    Console.WriteLine("Saque realizado com sucesso. Novo saldo da conta: " + conta.Saldo);
+                    return $"Saque realizado com sucesso. Novo saldo da conta: {conta.Saldo}";
                 }
                 else
                 {
-                    Console.WriteLine("Não foi possível realizar o saque.");
+                    return "Não foi possível realizar o saque.";
                 }
             }
             else
             {
-                Console.WriteLine("Conta não encontrada.");
+                return "Conta não encontrada.";
             }
         }
 
-        public void EfetuarTransferencia()
+        public List<string> EfetuarTransferencia(int idContaOrigem, int idContaDestino, double valor)
         {
-            Console.Write("Digite o Id da conta de origem: ");
-            int idContaOrigem = int.Parse(Console.ReadLine());
-
             ContaObj contaOrigem = _conta.BuscarContaPorId(idContaOrigem);
+            List<string> retorno = new List<string>();
 
-            if (contaOrigem != null)
+            if (contaOrigem != null && contaOrigem.Id > 0)
             {
-                Console.Write("Digite o Id da conta de destino: ");
-                int idContaDestino = int.Parse(Console.ReadLine());
-
                 ContaObj contaDestino = _conta.BuscarContaPorId(idContaDestino);
 
-                if (contaDestino != null)
+                if (contaDestino != null && contaDestino.Id > 0)
                 {
-                    Console.Write("Digite o valor a ser transferido: ");
-                    double valor = double.Parse(Console.ReadLine());
-
                     double saldoOrigem;
-
                     double saldoDestino;
                     if (_conta.RealizarTransferencia(contaOrigem, contaDestino, valor, out saldoOrigem, out saldoDestino))
                     {
-                        Console.WriteLine("Transferência realizada com sucesso.");
-                        Console.WriteLine("Novo saldo da conta de origem: " + saldoOrigem);
-                        Console.WriteLine("Novo saldo da conta de destino: " + saldoDestino);
+                        retorno.Add("Transferência realizada com sucesso.");
+                        retorno.Add("Novo saldo da conta de origem: " + saldoOrigem);
+                        retorno.Add("Novo saldo da conta de destino: " + saldoDestino);
                     }
                     else
                     {
-                        Console.WriteLine("Saldo insuficiente na conta de origem.");
+                        retorno.Add("Saldo insuficiente na conta de origem.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Conta de destino não encontrada.");
+                    retorno.Add("Conta de destino não encontrada.");
                 }
             }
             else
             {
-                Console.WriteLine("Conta de origem não encontrada.");
+                retorno.Add("Conta de origem não encontrada.");
             }
+            return retorno;
         }
     }
 }

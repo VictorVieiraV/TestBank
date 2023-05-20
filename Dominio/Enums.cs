@@ -18,7 +18,7 @@
         {
             Paga = 1,
             Vencida = 2,
-            EmDia = 2,
+            Aberta = 3,
         }
     }
 }

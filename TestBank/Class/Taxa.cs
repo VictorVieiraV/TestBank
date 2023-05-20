@@ -5,15 +5,14 @@ namespace TestBank.Class
 {
     public class Taxa
     {
-        List<TaxaObj> listaTaxas = new List<TaxaObj>();
-        public void AdicionarTaxa()
+        List<TaxaObj> _listaTaxas;
+        public Taxa(List<TaxaObj> listaTaxas)
         {
-            Console.Write("Informe a descrição da taxa: ");
-            string descricao = Console.ReadLine();
-            Console.Write("Informe o valor da taxa: ");
-            double valor = double.Parse(Console.ReadLine());
-
-            int maxTaxas = listaTaxas.Count();
+            _listaTaxas = listaTaxas;
+        }
+        public string AdicionarTaxa(string descricao, double valor)
+        {
+            int maxTaxas = _listaTaxas.Count();
             TaxaObj taxaObj = new TaxaObj()
             {
                 Descricao = descricao,
@@ -21,40 +20,35 @@ namespace TestBank.Class
                 Valor = valor
             };
 
-            listaTaxas.Add(taxaObj);
-            Console.WriteLine("Taxa adicionada com sucesso!");
+            _listaTaxas.Add(taxaObj);
+            return "Taxa adicionada com sucesso!";
         }
 
-        public void RemoverTaxa()
+        public string RemoverTaxa(int idTaxa)
         {
-            Console.Write("Informe o Id da taxa que deseja remover: ");
-            int idTaxa = int.Parse(Console.ReadLine());
-
             TaxaObj taxaSelecionada = BuscarTaxaPorId(idTaxa);
 
-            if (taxaSelecionada != null)
+            if (taxaSelecionada != null && taxaSelecionada.IdTaxa > 0)
             {
-                listaTaxas.Remove(taxaSelecionada);
-                Console.WriteLine("Taxa removida com sucesso!");
+                _listaTaxas.Remove(taxaSelecionada);
+                return "Taxa removida com sucesso!";
             }
-            else
-            {
-                Console.WriteLine("Taxa não encontrada.");
-            }
+            return "Taxa não encontrada.";
         }
 
         public TaxaObj BuscarTaxaPorId(int IdTaxa)
         {
-            return listaTaxas.Where(x => x.IdTaxa == IdTaxa).FirstOrDefault();
+            return _listaTaxas.Where(x => x.IdTaxa == IdTaxa).FirstOrDefault();
         }
 
-        public void ConsultarTodasTaxas()
+        public List<string> ConsultarTodasTaxas()
         {
-            Console.WriteLine("Taxas cadastradas:");
-            foreach (var taxa in listaTaxas)
+            List<string> result = new List<string>();
+            foreach (var taxa in _listaTaxas)
             {
-                Console.WriteLine($"Id:{taxa.IdTaxa}   /   Descricao: {taxa.Descricao}   /   Valor: {taxa.Valor}");
+                result.Add($"Id:{taxa.IdTaxa}   /   Descricao: {taxa.Descricao}   /   Valor: {taxa.Valor}");
             }
+            return result;
         }
     }
 }

@@ -4,7 +4,12 @@ namespace TestBank.Class
 {
     public class Cliente
     {
-        List<ClienteObj> listaClientes = new List<ClienteObj>();
+        private List<ClienteObj> _listaClientes;
+
+        public Cliente(List<ClienteObj> listaClientes)
+        {
+            _listaClientes = listaClientes;
+        }
 
         public void CadastrarCliente()
         {
@@ -34,38 +39,20 @@ namespace TestBank.Class
 
         public void AlterarCliente(ClienteObj cli)
         {
-            ClienteObj cliente = BuscarClientePorCpf(cli.Cpf);
-
-            if (cliente.Cpf != null)
+            foreach (var item in _listaClientes)
             {
-                cliente.Nome = cli.Nome;
-                cliente.Telefone = cli.Telefone;
-                cliente.Endereco = cli.Endereco;
-            }
-        }
-
-        public void ConsultarCliente()
-        {
-            Console.WriteLine("Digite o CPF do cliente que deseja consultar:");
-            string cpf = Console.ReadLine();
-
-            ClienteObj cliente = BuscarClientePorCpf(cpf);
-
-            if (cliente.Cpf != null)
-            {
-                Console.WriteLine($"Dados Cliente");
-                Console.WriteLine($"Nome: {cliente.Nome}");
-                Console.WriteLine($"CPF: {cliente.Cpf}");
-            }
-            else
-            {
-                Console.WriteLine($"Cliente com CPF {cpf} não encontrado.");
+                if (item.Cpf == cli.Cpf)
+                {
+                    item.Nome = cli.Nome;
+                    item.Telefone = cli.Telefone;
+                    item.Endereco = cli.Endereco;
+                }
             }
         }
 
         public ClienteObj BuscarClientePorCpf(string cpf)
         {
-            var cliente = listaClientes.Where(x => x.Cpf == cpf).FirstOrDefault();
+            var cliente = _listaClientes.Where(x => x.Cpf == cpf).FirstOrDefault();
 
             if (cliente != null)
             {
@@ -76,7 +63,7 @@ namespace TestBank.Class
 
         public void AddCliente(ClienteObj clienteObj)
         {
-            listaClientes.Add(clienteObj);
+            _listaClientes.Add(clienteObj);
         }
     }
 }
